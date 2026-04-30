@@ -18,15 +18,14 @@ import {
   sortReviews
 } from '../../utils/customFunctions'
 
-
-
-
-
 const Reviews = ({ navigation, route }) => {
   const { t } = useTranslation()
 
   const restaurant = route.params.restaurantObject
-  const { reviews } = restaurant
+  const reviews = restaurant.reviews.filter((review) =>
+    review.description?.trim()
+  )
+  const totalReviews = reviews.length
   const reviewGroups = groupAndCount(reviews, 'rating')
   const [sortBy, setSortBy] = useState('newest')
   const sortingParams = {
@@ -85,7 +84,7 @@ const Reviews = ({ navigation, route }) => {
             }}
           >
             <TextDefault bold H3 textColor={currentTheme.newFontcolor}>
-              {t('allRatings')} ({restaurant.total})
+              {t('allRatings')} ({totalReviews})
             </TextDefault>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <StarRating />
@@ -98,7 +97,9 @@ const Reviews = ({ navigation, route }) => {
             {Object.keys(reviewGroups)
               .sort((a, b) => b - a)
               .map((i, index) => {
-                const filled = (reviewGroups[i] / restaurant.total) * 100
+                const filled = totalReviews
+                  ? (reviewGroups[i] / totalReviews) * 100
+                  : 0
                 const unfilled = filled ? 100 - filled : 100
                 return (
                   <View
@@ -176,7 +177,7 @@ const Reviews = ({ navigation, route }) => {
               <ReviewCard
                 key={review._id}
                 name={review.order.user.name}
-                description={review.description}
+                description={review.description.trim()}
                 rating={review.rating}
                 date={calculateDaysAgo(review.createdAt)}
                 theme={currentTheme}
@@ -184,9 +185,11 @@ const Reviews = ({ navigation, route }) => {
             ))}
           </View>
           <View style={{ ...alignment.MTlarge }}>
-            {sorted.length === 0 ? (
+            {sorted.length === 0
+              ? (
               <TextDefault center H4 bold>{t('unReadReviews')}</TextDefault>
-            ) : null}
+                )
+              : null}
           </View>
         </View>
       </ScrollView>

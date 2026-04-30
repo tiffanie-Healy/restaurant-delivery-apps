@@ -49,8 +49,6 @@ function RateAndReview(props) {
   useLayoutEffect(() => {
     props.navigation.setOptions({
       headerTitle: '',
-      headerRight: null,
-
       headerTransparent: true,
       headerTitleAlign: 'center',
       headerRight: null,
@@ -88,12 +86,21 @@ function RateAndReview(props) {
   }
 
   function onSubmit() {
+    const trimmedDescription = description.trim()
+
     if (rating > 0 && rating < 6) {
+      if (!trimmedDescription) {
+        FlashMessage({
+          message: 'Please add review first'
+        })
+        return
+      }
+
       mutate({
         variables: {
           order: id,
-          rating: rating,
-          description: description
+          rating,
+          description: trimmedDescription
         }
       })
     } else {

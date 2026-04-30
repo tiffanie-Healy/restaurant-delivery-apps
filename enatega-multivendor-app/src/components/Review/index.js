@@ -12,6 +12,7 @@ import gql from 'graphql-tag'
 import { useApolloClient, useMutation } from '@apollo/client'
 import { reviewOrder } from '../../apollo/mutations'
 import { useTranslation } from 'react-i18next'
+import { FlashMessage } from '../../ui/FlashMessage/FlashMessage'
 
 const SCREEN_HEIGHT = Dimensions.get('screen').height
 const MODAL_HEIGHT = Math.floor(SCREEN_HEIGHT / 4)
@@ -53,7 +54,20 @@ function Review({ onOverlayPress, theme, orderId, rating }, ref) {
   }, [orderId])
 
   const onSubmit = () => {
-    mutate({variables: { order: orderId, description, rating: ratingRef.current }})
+    const trimmedDescription = description.trim()
+
+    if (!trimmedDescription) {
+      FlashMessage({ message: 'Please add review first' })
+      return
+    }
+
+    mutate({
+      variables: {
+        order: orderId,
+        description: trimmedDescription,
+        rating: ratingRef.current
+      }
+    })
   }
   return (
     <Modalize snapPoint={SNAP_HEIGHT} handlePosition='inside' ref={ref} withHandle={false} adjustToContentHeight modalStyle={{ borderWidth: StyleSheet.hairlineWidth }} onOverlayPress={onOverlayPress}>
@@ -74,7 +88,7 @@ function Review({ onOverlayPress, theme, orderId, rating }, ref) {
             </View>
           </View>
           <View>
-            <Image source={order?.restaurant?.image ? { uri: order?.restaurant?.image }: require('../../assets/images/food_placeholder.png') } style={styles.image}/>
+            <Image source={order?.restaurant?.image ? { uri: order?.restaurant?.image } : require('../../assets/images/food_placeholder.png') } style={styles.image}/>
 
           </View>
         </View>
@@ -83,7 +97,7 @@ function Review({ onOverlayPress, theme, orderId, rating }, ref) {
           <StarRating numberOfStars={5} onSelect={onSelectRating} defaultRating={rating}/>
         </View>
 
-        {(showSection || rating>0) && <View>
+        {(showSection || rating > 0) && <View>
           <TextDefault textColor={theme.gray900} H4 bolder style={{ marginVertical: scale(8) }}>{t('tellAboutExp')} {order?.restaurant?.name}</TextDefault>
           {/* <OutlinedTextField
             label={t('review')}
@@ -114,12 +128,12 @@ function Review({ onOverlayPress, theme, orderId, rating }, ref) {
   )
 }
 
-const StarRating = ({ numberOfStars = 5, onSelect, defaultRating=0 }) => {
+const StarRating = ({ numberOfStars = 5, onSelect, defaultRating = 0 }) => {
   const stars = Array.from({ length: numberOfStars }, (_, index) => index + 1)
   const [selected, setSelected] = useState(defaultRating)
-  useEffect(()=>{
-    if(defaultRating) onSelect(defaultRating)
-  },[])
+  useEffect(() => {
+    if (defaultRating) onSelect(defaultRating)
+  }, [])
   const onPress = index => {
     onSelect(index)
     setSelected(index)
