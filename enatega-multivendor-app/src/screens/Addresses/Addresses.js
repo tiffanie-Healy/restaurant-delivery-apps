@@ -4,7 +4,8 @@ import {
   TouchableOpacity,
   FlatList,
   StatusBar,
-  Platform
+  Platform,
+  Alert
 } from 'react-native'
 import { NetworkStatus, useMutation } from '@apollo/client'
 import {
@@ -52,9 +53,27 @@ function Addresses() {
   const currentTheme = theme[themeContext.ThemeValue]
   const { t } = useTranslation()
 
-    function onCompleted() {
-      FlashMessage({ message: t('addressDeletedMessage') })
-    }
+  function onCompleted() {
+    FlashMessage({ message: t('addressDeletedMessage') })
+  }
+
+  function confirmDeleteAddress(id) {
+    Alert.alert(
+      t('deleteAddress'),
+      t('deleteAddressConfirmation'),
+      [
+        {
+          text: t('Cancel'),
+          style: 'cancel'
+        },
+        {
+          text: t('deleteAddress'),
+          onPress: () => mutate({ variables: { id } })
+        }
+      ],
+      { cancelable: true }
+    )
+  }
 
   useFocusEffect(() => {
     if (Platform.OS === 'android') {
@@ -204,7 +223,7 @@ function Addresses() {
                   activeOpacity={0.7}
                   disabled={loadingMutation}
                   onPress={() => {
-                    mutate({ variables: { id: address._id } })
+                    confirmDeleteAddress(address._id)
                   }}
                 >
                   

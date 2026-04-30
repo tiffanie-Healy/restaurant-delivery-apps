@@ -6,7 +6,8 @@ import {
   StatusBar,
   Platform,
   Text,
-  ScrollView
+  ScrollView,
+  Alert
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useMutation } from '@apollo/client'
@@ -30,6 +31,7 @@ import { alignment } from '../../utils/alignment'
 import { useNavigation, useFocusEffect } from '@react-navigation/native'
 import EmptyAddress from '../../assets/SVG/imageComponents/EmptyAddress'
 import analytics from '../../utils/analytics'
+import { FlashMessage } from '../../ui/FlashMessage/FlashMessage'
 import navigationService from '../../routes/navigationService'
 import { HeaderBackButton } from '@react-navigation/elements'
 import CustomHomeIcon from '../../assets/SVG/imageComponents/CustomHomeIcon'
@@ -45,12 +47,37 @@ function Addresses() {
   const Analytics = analytics()
 
   const navigation = useNavigation()
-  const [mutate, { loading: loadingMutation }] = useMutation(DELETE_ADDRESS)
+  const [mutate, { loading: loadingMutation }] = useMutation(DELETE_ADDRESS, {
+    onCompleted
+  })
   const { profile } = useContext(UserContext)
   const themeContext = useContext(ThemeContext)
   const currentTheme = theme[themeContext.ThemeValue]
   const inset = useSafeAreaInsets()
   const { t } = useTranslation()
+
+  function onCompleted() {
+    FlashMessage({ message: t('addressDeletedMessage') })
+  }
+
+  function confirmDeleteAddress(id) {
+    Alert.alert(
+      t('deleteAddress'),
+      t('deleteAddressConfirmation'),
+      [
+        {
+          text: t('Cancel'),
+          style: 'cancel'
+        },
+        {
+          text: t('deleteAddress'),
+          onPress: () => mutate({ variables: { id } })
+        }
+      ],
+      { cancelable: true }
+    )
+  }
+
   useFocusEffect(() => {
     if (Platform.OS === 'android') {
       StatusBar.setBackgroundColor(currentTheme.headerBackground)
@@ -201,7 +228,7 @@ function Addresses() {
                     activeOpacity={0.7}
                     disabled={loadingMutation}
                     onPress={() => {
-                      mutate({ variables: { id: address._id } })
+                      confirmDeleteAddress(address._id)
                     }}>
                     <EvilIcons
                       name="trash"
