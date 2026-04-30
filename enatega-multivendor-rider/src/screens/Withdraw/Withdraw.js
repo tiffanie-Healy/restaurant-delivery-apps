@@ -32,6 +32,8 @@ const Withdraw = () => {
   } = useWithdrawRequest()
 
   const { t } = useTranslation()
+  const hasAmount = amount.trim().length > 0
+
   return (
     <WalletScreenBg backBtn>
       {requestSent ? (
@@ -62,26 +64,22 @@ const Withdraw = () => {
               amount={dataProfile.rider.currentWalletAmount.toFixed(2)}
             />
             <View style={styles.inputView}>
-              {/* <TextInput
-                placeholder="$0.00"
-                value={amount}
-                onChangeText={text => setAmount(parseFloat(text))}
-                style={[styles.textInput, error && styles.errorInput]}
-              /> */}
               <TextInput
                 placeholder="$0.00"
-                value={amount !== undefined ? amount : ''}
-                onChangeText={(text) => setAmount(parseFloat(text))}
+                value={amount}
+                onChangeText={setAmount}
                 style={[styles.textInput, error && styles.errorInput]}
               />
-              <TextDefault
-                style={styles.inputText}
-                H4
-                textColor={
-                  error ? colors.textErrorColor : colors.fontSecondColor
-                }>
-                {error || t('enteramount')}
-              </TextDefault>
+              {(error || !hasAmount) && (
+                <TextDefault
+                  style={styles.inputText}
+                  H4
+                  textColor={
+                    error ? colors.textErrorColor : colors.fontSecondColor
+                  }>
+                  {error || t('enteramount')}
+                </TextDefault>
+              )}
             </View>
             <View style={styles.btnView}>
               {loading ? (

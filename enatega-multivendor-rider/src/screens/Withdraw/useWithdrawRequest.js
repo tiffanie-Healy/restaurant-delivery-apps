@@ -1,5 +1,6 @@
 import { Dimensions } from 'react-native'
 import { useContext, useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { gql, useMutation } from '@apollo/client'
 import { createWithdrawRequest } from '../../apollo/mutations'
@@ -11,12 +12,11 @@ import { MIN_WITHDRAW_AMOUNT } from '../../utilities/constants'
 const WITHDRAW_REQUEST = gql`
   ${createWithdrawRequest}
 `
-import {useTranslation} from 'react-i18next'
 
 export const useWithdrawRequest = () => {
-  const {t} = useTranslation()
+  const { t } = useTranslation()
   const [error, setError] = useState(false)
-  const [amount, setAmount] = useState("")
+  const [amount, setAmount] = useState('')
   const [requestSent, setRequestSent] = useState(false)
   const { height } = Dimensions.get('window')
   const { dataProfile } = useContext(UserContext)
@@ -61,6 +61,11 @@ export const useWithdrawRequest = () => {
     })
   }
 
+  function onChangeAmount(amount) {
+    setAmount(amount)
+    if (error) setError('')
+  }
+
   function onSubmit() {
     if (validateForm()) {
       mutate({
@@ -74,7 +79,7 @@ export const useWithdrawRequest = () => {
     dataProfile,
     error,
     amount,
-    setAmount,
+    setAmount: onChangeAmount,
     requestSent,
     height,
     loading,
