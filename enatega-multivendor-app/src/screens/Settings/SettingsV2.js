@@ -7,7 +7,8 @@ import {
   Linking,
   StatusBar,
   ActivityIndicator,
-  Text
+  Text,
+  Alert
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as Updates from 'expo-updates'
@@ -156,16 +157,30 @@ function Settings(props) {
     checkPermission()
   }, [props.navigation, languageName])
 
+  async function handleDeletedAccountConfirmation() {
+    await logout()
+    navigation.reset({
+      routes: [{ name: 'Main' }]
+    })
+  }
+
   async function deactivatewithemail() {
     try {
       await deactivated({
         variables: { isActive: false, email: profile.email }
       })
-      logout()
-      navigation.reset({
-        routes: [{ name: 'Main' }]
-      })
-      FlashMessage({ message: t('accountDeactivated') })
+      modalizeRef.current.close()
+      Alert.alert(
+        t('accountDeleted'),
+        t('accountDeletedMessage'),
+        [
+          {
+            text: t('okText'),
+            onPress: handleDeletedAccountConfirmation
+          }
+        ],
+        { cancelable: false }
+      )
     } catch (error) {
       console.error('Error during deactivation mutation:', error)
     }

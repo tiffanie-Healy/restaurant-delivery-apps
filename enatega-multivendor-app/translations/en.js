@@ -298,6 +298,8 @@ export const en = {
   numberAddedAlert: 'Phone number has been added successfully!.',
   itemNotAvailable: 'One or more item is not available',
   accountDeactivated: 'Account Deactivated',
+  accountDeleted: 'Account Deleted',
+  accountDeletedMessage: 'Your account has been deleted successfully.',
   addressUpdated: 'Address Updated',
   errorOccured: 'An error occured. Please try again ',
   otpForResetPassword: 'OTP for reset password has been sent to your email.',

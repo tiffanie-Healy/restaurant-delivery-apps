@@ -13,7 +13,8 @@ import {
   StatusBar,
   Text,
   Modal,
-  Pressable
+  Pressable,
+  Alert
 } from 'react-native'
 import { useMutation } from '@apollo/client'
 import gql from 'graphql-tag'
@@ -72,13 +73,26 @@ function Profile(props) {
     onError
   })
 
-  const onCompletedDeactivate = () => {
-    setDeleteModalVisible(false)
-    logout()
+  async function handleDeletedAccountConfirmation() {
+    await logout()
     navigation.reset({
       routes: [{ name: 'Main' }]
     })
-    FlashMessage({ message: t('accountDeactivated'), duration: 5000 })
+  }
+
+  const onCompletedDeactivate = () => {
+    setDeleteModalVisible(false)
+    Alert.alert(
+      t('accountDeleted'),
+      t('accountDeletedMessage'),
+      [
+        {
+          text: t('okText'),
+          onPress: handleDeletedAccountConfirmation
+        }
+      ],
+      { cancelable: false }
+    )
   }
   const onErrorDeactivate = (error) => {
     if (error.graphQLErrors) {
