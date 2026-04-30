@@ -519,6 +519,8 @@ export const en = {
   LowestRating: 'Lowest Rating',
   cartAddresses: 'Cart Addresses',
   addressDeletedMessage: 'Address deleted!',
+  deleteAddress: 'Delete Address',
+  deleteAddressConfirmation: 'Are you sure you want to delete this address?',
   logoutMessage: 'Successfully logged out',
   somethingWentWrong: 'Something went wrong',
   checkInternet: 'Check your internet connection',
